@@ -5,16 +5,16 @@ param foundryName string = 'aif-${take(uniqueString(subscription().subscriptionI
 param projectName string = 'foundry-claude-project'
 
 @description('Azure region for the Foundry account and project.')
-param location string = 'eastus2'
+param location string = 'australiaeast'
 
 @description('Claude model ID available in the selected region.')
-param claudeModelName string = 'claude-sonnet-4-6'
+param claudeModelName string = 'claude-opus-5'
 
 @description('Claude model version.')
 param claudeModelVersion string = '1'
 
 @description('Name applications use to address this deployment.')
-param claudeDeploymentName string = 'claude-sonnet-global'
+param claudeDeploymentName string = 'claude-opus-5-global'
 
 @description('Global Standard capacity in thousands of tokens per minute.')
 @minValue(1)

@@ -33,7 +33,7 @@ The source template is [`infra/main.bicep`](infra/main.bicep). [`infra/azuredepl
 ```bash
 az group create \
   --name rg-foundry-claude-prod \
-  --location eastus2
+  --location australiaeast
 
 az deployment group create \
   --resource-group rg-foundry-claude-prod \

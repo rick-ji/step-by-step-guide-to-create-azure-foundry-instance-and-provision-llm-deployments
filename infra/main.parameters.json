@@ -6,16 +6,16 @@
       "value": "foundry-claude-project"
     },
     "location": {
-      "value": "eastus2"
+      "value": "australiaeast"
     },
     "claudeModelName": {
-      "value": "claude-sonnet-4-6"
+      "value": "claude-opus-5"
     },
     "claudeModelVersion": {
       "value": "1"
     },
     "claudeDeploymentName": {
-      "value": "claude-sonnet-global"
+      "value": "claude-opus-5-global"
     },
     "claudeCapacity": {
       "value": 25
