@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "value": "foundry-claude-project"
+    },
+    "location": {
+      "value": "eastus2"
+    },
+    "claudeModelName": {
+      "value": "claude-sonnet-4-6"
+    },
+    "claudeModelVersion": {
+      "value": "1"
+    },
+    "claudeDeploymentName": {
+      "value": "claude-sonnet-global"
+    },
+    "claudeCapacity": {
+      "value": 25
+    },
+    "claudeIndustry": {
+      "value": "technology"
+    },
+    "monthlyBudgetAmount": {
+      "value": 200
+    }
+  }
+}

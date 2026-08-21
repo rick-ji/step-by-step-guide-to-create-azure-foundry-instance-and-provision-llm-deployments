@@ -4,6 +4,49 @@ This guide explains how to create a Microsoft Foundry resource and project, depl
 
 > Azure AI Foundry is now called **Microsoft Foundry**. An "instance" generally consists of a Foundry resource/account containing one or more projects.
 
+## Deploy the complete environment
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Frick-ji%2Fstep-by-step-guide-to-create-azure-foundry-instance-and-provision-llm-deployments%2Fmain%2Finfra%2Fazuredeploy.json)
+
+The button opens an Azure custom deployment and creates:
+
+- A Microsoft Foundry account with project management enabled.
+- A Foundry project.
+- A Claude **Global Standard** deployment.
+- Governance tags on the Foundry account and project.
+- A monthly resource-group budget preconfigured to `200`, with actual alerts at 80% and 100% and a forecasted alert at 100%.
+
+Most template values are prepopulated. You must supply:
+
+- `claudeOrganizationName`: the real legal organization accepting Anthropic's Marketplace terms.
+- `claudeCountryCode`: the organization's two-letter ISO country code.
+- `budgetAlertEmail`: the notification recipient.
+
+Before selecting **Review + create**, verify the model is available in the selected region, the billing currency is USD if `200` is intended to mean USD 200, and the organization information is accurate. Deploying the template submits `modelProviderData` and accepts the Anthropic Marketplace offer. Review [Anthropic's commercial terms](https://www.anthropic.com/legal/commercial-terms) first.
+
+The deployment uses public network access and permits API-key authentication to keep the example broadly usable. Production environments should evaluate private endpoints, disabling local authentication, customer-managed keys, least-privilege RBAC, and Azure Policy before deployment.
+
+### Deploy with Azure CLI
+
+The source template is [`infra/main.bicep`](infra/main.bicep). [`infra/azuredeploy.json`](infra/azuredeploy.json) is the compiled ARM template used by the button, and [`infra/main.parameters.json`](infra/main.parameters.json) contains reusable non-sensitive defaults.
+
+```bash
+az group create \
+  --name rg-foundry-claude-prod \
+  --location eastus2
+
+az deployment group create \
+  --resource-group rg-foundry-claude-prod \
+  --template-file infra/main.bicep \
+  --parameters @infra/main.parameters.json \
+  --parameters \
+    claudeOrganizationName="<legal-organization-name>" \
+    claudeCountryCode="<two-letter-country-code>" \
+    budgetAlertEmail="<alert-recipient@example.com>"
+```
+
+The account name is generated from the subscription and resource-group IDs so that its custom subdomain is stable and globally unique in normal use. Override `foundryName` if your naming policy requires another value.
+
 ## 1. Check the prerequisites
 
 You need:
