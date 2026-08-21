@@ -6,7 +6,7 @@ This guide explains how to create a Microsoft Foundry resource and project, depl
 
 ## Deploy the complete environment
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Frick-ji%2Fstep-by-step-guide-to-create-azure-foundry-instance-and-provision-llm-deployments%2F17469cd8ca7de9d0abd71de8cf1d997ff235653a%2Finfra%2Fazuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Frick-ji%2Fstep-by-step-guide-to-create-azure-foundry-instance-and-provision-llm-deployments%2F65c22ef8f243ba7c3f47f9ab21dd10725624cb33%2Finfra%2Fazuredeploy.json)
 
 The button opens an Azure custom deployment and creates:
 
