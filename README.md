@@ -153,7 +153,7 @@ Claude consumption is billed through **Claude Consumption Units (CCUs)** on the 
 ## 7. Create a Global Standard deployment
 
 1. Choose the desired model and hosting version.
-2. Enter a deployment name, such as `claude-sonnet-prod`.
+2. Enter a deployment name, such as `claude-opus-5-global`.
 3. Set **Region scope** to **Global**. This corresponds to the `GlobalStandard` deployment SKU.
 4. Review the available quota and rate limits.
 5. Select **Deploy**.
@@ -170,7 +170,80 @@ Global Standard is generally the best starting point for broad availability and 
 
 Don't use Global Standard where policy requires inference processing to stay in a specific country, region, or data zone. Where the chosen model supports it, evaluate **Data Zone Standard** instead.
 
-## 8. Configure a USD 200 monthly budget
+## 8. Retrieve the API endpoint and key
+
+The deployment exposes the Claude Messages API through:
+
+```text
+Base URL:   https://<foundry-resource-name>.services.ai.azure.com/anthropic
+Target URI: https://<foundry-resource-name>.services.ai.azure.com/anthropic/v1/messages
+Model:      <deployment-name>
+```
+
+The `model` value in each request must be the **deployment name**, not necessarily the catalog model ID. This repository's defaults use `claude-opus-5-global`.
+
+### Retrieve them in the portal
+
+1. Sign in to [Microsoft Foundry](https://ai.azure.com) and open the project.
+2. Open the deployed Claude model and select **Details**.
+3. Copy the **Target URI** or **Base URL**, deployment name, and API key shown for the deployment.
+4. If the key isn't shown in Foundry, open the Foundry resource in the [Azure portal](https://portal.azure.com).
+5. Under **Resource Management**, select **Keys and Endpoint**.
+6. Select **Show keys**, then copy **KEY 1** or **KEY 2**.
+
+Both keys authorize access to the Foundry account. They aren't restricted to one deployment.
+
+### Retrieve them with Azure CLI
+
+Replace the resource-group and account names if you overrode the template defaults:
+
+```bash
+RESOURCE_GROUP="rg-foundry-claude-prod"
+FOUNDRY_NAME="$(
+  az cognitiveservices account list \
+    --resource-group "$RESOURCE_GROUP" \
+    --query "[?kind=='AIServices'].name | [0]" \
+    --output tsv
+)"
+
+export CLAUDE_BASE_URL="https://${FOUNDRY_NAME}.services.ai.azure.com/anthropic"
+export CLAUDE_TARGET_URI="${CLAUDE_BASE_URL}/v1/messages"
+export CLAUDE_DEPLOYMENT_NAME="claude-opus-5-global"
+export AZURE_API_KEY="$(
+  az cognitiveservices account keys list \
+    --resource-group "$RESOURCE_GROUP" \
+    --name "$FOUNDRY_NAME" \
+    --query key1 \
+    --output tsv
+)"
+```
+
+The Bicep deployment also returns `claudeBaseUrl` and `claudeModelDeploymentName` as non-secret outputs. It deliberately doesn't return an API key because ARM deployment outputs and histories shouldn't contain secrets.
+
+### Test the Claude Messages API
+
+```bash
+curl --request POST "$CLAUDE_TARGET_URI" \
+  --header "Content-Type: application/json" \
+  --header "x-api-key: $AZURE_API_KEY" \
+  --header "anthropic-version: 2023-06-01" \
+  --data "{
+    \"model\": \"$CLAUDE_DEPLOYMENT_NAME\",
+    \"max_tokens\": 256,
+    \"messages\": [
+      {
+        \"role\": \"user\",
+        \"content\": \"Reply with a short confirmation that the deployment is working.\"
+      }
+    ]
+  }"
+```
+
+A successful request returns a JSON message response. A `401` usually indicates an invalid key, while a `404` commonly indicates an incorrect resource endpoint or deployment name.
+
+Don't commit API keys or store them in source code, scripts, pipeline variables that aren't secret-protected, or application configuration files. Store production keys in Azure Key Vault and rotate between KEY 1 and KEY 2. Prefer Microsoft Entra ID authentication over account keys for production workloads where possible.
+
+## 9. Configure a USD 200 monthly budget
 
 The Azure portal doesn't create a budget directly at an individual Foundry-resource scope. Use the dedicated resource group as the closest reliable scope.
 
@@ -195,7 +268,7 @@ The Azure portal doesn't create a budget directly at an individual Foundry-resou
 
 Budgets are normally evaluated in the billing account's currency. If that currency isn't USD, convert USD 200 into the billing currency and review the conversion periodically.
 
-## 9. Understand budget limitations
+## 10. Understand budget limitations
 
 An Azure budget is an alert, not a hard spending cap:
 
@@ -208,7 +281,7 @@ An Azure budget is an alert, not a hard spending cap:
 
 For stronger controls, combine the budget with application-side request limits, token limits, conservative TPM/RPM quota, per-user quotas, usage monitoring, and carefully tested Action Group automation.
 
-## 10. Validate the deployment
+## 11. Validate the deployment
 
 Confirm:
 
@@ -217,6 +290,7 @@ Confirm:
 - Region scope is Global/Global Standard.
 - The intended hosting version is selected.
 - The model is generally available if used in production.
+- The API target URI and deployment name produce a successful test response.
 - Resource-group and Foundry-resource tags are present.
 - The monthly budget amount is USD 200 or its billing-currency equivalent.
 - Actual and forecasted alerts have valid recipients.
