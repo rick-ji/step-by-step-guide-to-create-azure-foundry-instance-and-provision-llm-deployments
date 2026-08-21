@@ -6,7 +6,7 @@
       "value": "foundry-claude-project"
     },
     "location": {
-      "value": "australiaeast"
+      "value": "eastus2"
     },
     "claudeModelName": {
       "value": "claude-opus-5"

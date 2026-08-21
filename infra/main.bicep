@@ -5,7 +5,7 @@ param foundryName string = 'aif-${take(uniqueString(subscription().subscriptionI
 param projectName string = 'foundry-claude-project'
 
 @description('Azure region for the Foundry account and project.')
-param location string = 'australiaeast'
+param location string = 'eastus2'
 
 @description('Claude model ID available in the selected region.')
 param claudeModelName string = 'claude-opus-5'

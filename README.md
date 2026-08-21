@@ -24,6 +24,8 @@ Most template values are prepopulated. You must supply:
 
 Before selecting **Review + create**, verify the model is available in the selected region, the billing currency is USD if `200` is intended to mean USD 200, and the organization information is accurate. Deploying the template submits `modelProviderData` and accepts the Anthropic Marketplace offer. Review [Anthropic's commercial terms](https://www.anthropic.com/legal/commercial-terms) first.
 
+> **Region compatibility:** The template defaults to `eastus2` because Claude Opus 5 version `1` with the `GlobalStandard` SKU is currently supported in East US 2 and Sweden Central, but not Australia East. A Foundry account in `australiaeast` can't host this deployment combination. If Australian regional placement is mandatory, select a model/SKU listed for Australia East instead of overriding this template's location.
+
 The deployment uses public network access and permits API-key authentication to keep the example broadly usable. Production environments should evaluate private endpoints, disabling local authentication, customer-managed keys, least-privilege RBAC, and Azure Policy before deployment.
 
 ### Deploy with Azure CLI
@@ -33,7 +35,7 @@ The source template is [`infra/main.bicep`](infra/main.bicep). [`infra/azuredepl
 ```bash
 az group create \
   --name rg-foundry-claude-prod \
-  --location australiaeast
+  --location eastus2
 
 az deployment group create \
   --resource-group rg-foundry-claude-prod \

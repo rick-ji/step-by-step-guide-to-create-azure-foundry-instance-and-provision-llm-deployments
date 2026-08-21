@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.42.1.51946",
-      "templateHash": "12882984612371883614"
+      "templateHash": "9963730623522653838"
     }
   },
   "parameters": {
@@ -25,7 +25,7 @@
     },
     "location": {
       "type": "string",
-      "defaultValue": "australiaeast",
+      "defaultValue": "eastus2",
       "metadata": {
         "description": "Azure region for the Foundry account and project."
       }
