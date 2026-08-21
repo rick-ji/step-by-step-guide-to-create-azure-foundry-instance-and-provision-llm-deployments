@@ -172,28 +172,36 @@ Global Standard is generally the best starting point for broad availability and 
 
 Don't use Global Standard where policy requires inference processing to stay in a specific country, region, or data zone. Where the chosen model supports it, evaluate **Data Zone Standard** instead.
 
-## 8. Retrieve the API endpoint and key
+## 8. Retrieve the Foundry and Claude API endpoints
 
-The deployment exposes the Claude Messages API through:
+The Foundry project endpoint and Claude inference endpoint serve different APIs:
 
 ```text
-Base URL:   https://<foundry-resource-name>.services.ai.azure.com/anthropic
-Target URI: https://<foundry-resource-name>.services.ai.azure.com/anthropic/v1/messages
-Model:      <deployment-name>
+Foundry project endpoint:
+https://<foundry-resource-name>.services.ai.azure.com/api/projects/<project-name>
+
+Claude SDK base URL:
+https://<foundry-resource-name>.services.ai.azure.com/anthropic
+
+Claude Messages API target URI:
+https://<foundry-resource-name>.services.ai.azure.com/anthropic/v1/messages
 ```
 
-The `model` value in each request must be the **deployment name**, not necessarily the catalog model ID. This repository's defaults use `claude-opus-5-global`.
+Use the **Foundry project endpoint** with the Foundry SDK, agents, evaluations, project files, tools, and project configuration. Use the provider-specific **Claude endpoint** with the Anthropic SDK or Claude Messages REST API when calling the deployed LLM.
+
+The Claude request's `model` value must be the **deployment name**, not necessarily the catalog model ID. This repository's defaults use `claude-opus-5-global`.
 
 ### Retrieve them in the portal
 
 1. Sign in to [Microsoft Foundry](https://ai.azure.com) and open the project.
-2. Open the deployed Claude model and select **Details**.
-3. Copy the **Target URI** or **Base URL**, deployment name, and API key shown for the deployment.
-4. If the key isn't shown in Foundry, open the Foundry resource in the [Azure portal](https://portal.azure.com).
-5. Under **Resource Management**, select **Keys and Endpoint**.
-6. Select **Show keys**, then copy **KEY 1** or **KEY 2**.
+2. Copy the **Project endpoint** from the project welcome or overview page. It ends with `/api/projects/<project-name>`.
+3. Open the deployed Claude model and select **Details**.
+4. Copy the Claude **Target URI** or **Base URL**, deployment name, and API key shown for the deployment.
+5. If the key isn't shown in Foundry, open the Foundry resource in the [Azure portal](https://portal.azure.com).
+6. Under **Resource Management**, select **Keys and Endpoint**.
+7. Select **Show keys**, then copy **KEY 1** or **KEY 2**.
 
-Both keys authorize access to the Foundry account. They aren't restricted to one deployment.
+Both account keys can authenticate Claude inference requests and aren't restricted to one deployment. They aren't a replacement for Microsoft Entra ID when using Foundry project APIs.
 
 ### Retrieve them with Azure CLI
 
@@ -201,6 +209,7 @@ Replace the resource-group and account names if you overrode the template defaul
 
 ```bash
 RESOURCE_GROUP="rg-foundry-claude-prod"
+PROJECT_NAME="foundry-claude-project"
 FOUNDRY_NAME="$(
   az cognitiveservices account list \
     --resource-group "$RESOURCE_GROUP" \
@@ -208,6 +217,7 @@ FOUNDRY_NAME="$(
     --output tsv
 )"
 
+export FOUNDRY_PROJECT_ENDPOINT="https://${FOUNDRY_NAME}.services.ai.azure.com/api/projects/${PROJECT_NAME}"
 export CLAUDE_BASE_URL="https://${FOUNDRY_NAME}.services.ai.azure.com/anthropic"
 export CLAUDE_TARGET_URI="${CLAUDE_BASE_URL}/v1/messages"
 export CLAUDE_DEPLOYMENT_NAME="claude-opus-5-global"
@@ -220,7 +230,7 @@ export AZURE_API_KEY="$(
 )"
 ```
 
-The Bicep deployment also returns `claudeBaseUrl` and `claudeModelDeploymentName` as non-secret outputs. It deliberately doesn't return an API key because ARM deployment outputs and histories shouldn't contain secrets.
+The Bicep deployment returns `foundryProjectEndpoint`, `claudeBaseUrl`, and `claudeModelDeploymentName` as non-secret outputs. It deliberately doesn't return an API key because ARM deployment outputs and histories shouldn't contain secrets.
 
 ### Test the Claude Messages API
 
